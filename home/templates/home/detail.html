@@ -1,0 +1,101 @@
+{#{% extends 'base.html' %}#}
+{#    {% block content %}#}
+{#        {% if request.user.id == post.user.id %}#}
+{#            <a class="btn btn-info" href="{% url 'home:PostUpdate' post.id%}">Update</a>#}
+{#            <a class="btn btn-danger" href="{% url 'home:PostDelete' post.id %}">Delete</a>#}
+{#        {% endif %}#}
+{#        <p><a href="{% url 'account:profile' post.user.id %}">{{ post.user.username }}</a> - {{ post.updated|date:"Y-M" }}</p>#}
+{#        <p>{{ post.body }}</p>#}
+{#        {% if request.user.is_authenticated %}#}
+{#            <a  href="{% url 'home:PostLike' post.id %}" class=" {% if can_like %}disabled{% endif %} btn btn-primary col-md-2 ">Like {{ post.post_like_count }}</a>#}
+{#        {% endif %}#}
+{#        <hr>#}
+{##}
+{##}
+{##}
+{#        <p>{{ comments.count }} Comments</p>#}
+{#        {% for comment in comments %}#}
+{#            <div class="card bg-dark text-white">#}
+{#                <p class="card-header">{{ comment.user }} | {{ comment.created|timesince }}</p>#}
+{#                <p class = "class-body">{{ comment.body }}</p>#}
+{#                <form action="{% url 'home:ReplyComment' post.id comment.id%}" method="post">#}
+{#                    {% csrf_token %}#}
+{#                    {{ form.as_p }}#}
+{#                    <input type="submit" value="Reply">#}
+{#                </form>#}
+{#                    {% with replies=comment.rcomments.all %}#}
+{#                    {% for reply in  replies %}#}
+{#                        <p class="bg-primary p-3 m-2 ">{{ reply.user }} <br> {{ reply.body }}</p>#}
+{#                    {% endfor %}#}
+{#                {% endwith %}#}
+{#            </div><br>#}
+{#        {% empty %}#}
+{#                <p class = "class body">No Comment Yet !!!!</p>#}
+{#        {% endfor %}#}
+{#        {% if request.user.is_authenticated %}#}
+{#            <form action="" method="POST">#}
+{#                {% csrf_token %}#}
+{#                {{ form.as_p }}#}
+{#                <input type="submit" value="send">#}
+{#            </form>#}
+{#        {% endif %}#}
+{##}
+{#    {% endblock %}#}
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-4">
+        {% if request.user.id == post.user.id %}
+            <div class="mb-3">
+                <a class="btn btn-info" href="{% url 'home:PostUpdate' post.id %}">Update</a>
+                <a class="btn btn-danger" href="{% url 'home:PostDelete' post.id %}">Delete</a>
+            </div>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'account:profile' post.user.id %}">{{ post.user.username }}</a> - {{ post.updated|date:"Y-M" }}
+        </p>
+        <p dir = rtl>{{ post.body }}</p>
+
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'home:PostLike' post.id %}" class="btn btn-primary col-md-2 {% if can_like %}disabled{% endif %}">Like {{ post.post_like_count }}</a>
+        {% endif %}
+
+        <hr>
+
+        <p>{{ comments.count }} Comments</p>
+        {% for comment in comments %}
+            <div class="card bg-dark text-white mt-3">
+                <div class="card-header">{{ comment.user }} | {{ comment.created|timesince }}</div>
+                <div class="card-body">
+                    <p dir="rtl" class="card-text">{{ comment.body }}</p>
+                    <form action="{% url 'home:ReplyComment' post.id comment.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="submit" value="Reply" class="btn btn-secondary">
+                    </form>
+
+                    {% with replies=comment.rcomments.all %}
+                        {% for reply in replies %}
+                            <div class="bg-primary p-3 m-2">
+                                <p>{{ reply.user }} <br> {{ reply.body }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+        {% empty %}
+            <p class="mt-3">No Comment Yet !!!!</p>
+        {% endfor %}
+
+        {% if request.user.is_authenticated %}
+            <form action="" method="POST" class="mt-3">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Send" class="btn btn-primary">
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}
